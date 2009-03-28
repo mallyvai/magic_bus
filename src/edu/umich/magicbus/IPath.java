@@ -29,12 +29,12 @@ public interface IPath
      * Gets the estimated time of travel for this path. Time is measured in seconds.
      * @return Estimated duration of travel in seconds.
      */
-    public long getDuration();
+    public double getDuration();
 
     /**
      * Gets the estimated walking distance involved in taking this path. This distance includes
      * both the distance from start location to start stop, and from end stop to end location.
      * @return Estimated walking distance involved in this path.
      */
-    public long getWalkingDistance();
+    public double getWalkingDistance();
 }

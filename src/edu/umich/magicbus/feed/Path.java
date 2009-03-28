@@ -4,40 +4,59 @@ import edu.umich.magicbus.IPath;
 import edu.umich.magicbus.IRoute;
 import edu.umich.magicbus.IStop;
 
-class Path implements IPath
+class Path implements IPath, Comparable<Path>
 {
-    public Path()
+    public Path(Route route, Stop srcStop, Stop destStop, double duration, double walkingDistance)
     {
+        mRoute = route;
+        mSourceStop = srcStop;
+        mDestinationStop = destStop;
+        mDuration = duration;
+        mWalkingDistance = walkingDistance;
     }
 
-    public long getDuration()
+    public double getDuration()
     {
-        // TODO Auto-generated method stub
-        return 0;
+        return mDuration;
     }
 
     public IStop getEndStop()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return mDestinationStop;
     }
 
     public IRoute getRoute()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return mRoute;
     }
 
     public IStop getStartStop()
     {
-        // TODO Auto-generated method stub
-        return null;
+        return mSourceStop;
     }
 
-    public long getWalkingDistance()
+    public double getWalkingDistance()
     {
-        // TODO Auto-generated method stub
+        return mWalkingDistance;
+    }
+
+    public int compareTo(Path otherPath)
+    {
+        double otherDuration = otherPath.getDuration();
+        if (mDuration < otherDuration)
+        {
+            return -1;
+        }
+        else if (mDuration > otherDuration)
+        {
+            return 1;
+        }
         return 0;
     }
 
+    private Route mRoute;
+    private Stop mSourceStop;
+    private Stop mDestinationStop;
+    private double mDuration;
+    private double mWalkingDistance;
 }
