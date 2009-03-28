@@ -25,8 +25,8 @@ public class Utilities
         double blat = b.getLatitude();
         double blon = b.getLongitude();
 
-        double dlat = blat - alat;
-        double dlon = blon - alon;
+        double dlat = (blat - alat) * Math.PI / 180.0; // conversion from degrees to radians.
+        double dlon = (blon - alon) * Math.PI / 180.0;
 
         double sin1 = Math.sin(dlat / 2);
         sin1 = sin1 * sin1;
@@ -34,7 +34,8 @@ public class Utilities
         double sin2 = Math.sin(dlon / 2);
         sin2 = sin2 * sin2;
 
-        double tmp1 = sin1 + (Math.cos(alat) * Math.cos(blat) * sin2);
+        double tmp1 = sin1 +
+            (Math.cos(alat * Math.PI / 180.0) * Math.cos(blat * Math.PI / 180.0) * sin2);
         double tmp2 = 2.0 * Math.atan2(Math.sqrt(tmp1), Math.sqrt(1.0 - tmp1));
 
         return cRadiusOfEarth * tmp2;

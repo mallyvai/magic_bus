@@ -7,7 +7,7 @@ import edu.umich.magicbus.LatLong;
 
 class Route implements IRoute
 {
-    public Route(String xml) throws XMLException
+    public Route(String xml, Feed feed) throws XMLException
     {
         if ((-1 == xml.indexOf("<route>")) || (-1 == xml.indexOf("</route>")))
         {
@@ -81,7 +81,9 @@ class Route implements IRoute
                 throw new XMLException("Invalid stop tag.");
             }
             end += 7;
-            mStops.add(new Stop(xml.substring(start, end), this));
+            Stop stop = new Stop(xml.substring(start, end), this);
+            mStops.add(stop);
+            feed.addStop(stop);
             start = end;
         }
 
@@ -114,7 +116,7 @@ class Route implements IRoute
      */
     public boolean isLoop()
     {
-        return (mTopOfLoop == 0);
+        return (mTopOfLoop != 0);
     }
 
     /**
@@ -123,9 +125,40 @@ class Route implements IRoute
      * @param radius Range in meters (walking distance).
      * @return All stops on this route in range of loc.
      */
-    public ArrayList<Stop> getStopsInRangeOf(LatLong loc, double radius)
+    public ArrayList<Stop> getStopsInRangeOf(LatLong loc, double radius, Stop after)
     {
-        return Utilities.getStopsInRangeOf(loc, radius, mStops);
+        if (isLoop())
+        {
+            return Utilities.getStopsInRangeOf(loc, radius, mStops);
+        }
+
+        ArrayList<Stop> ret = new ArrayList<Stop>();
+        boolean found = false;
+        for (Stop stop : mStops)
+        {
+            if (!found)
+            {
+                if (after.compareTo(stop) == 0)
+                {
+                    found = true;
+                }
+                else
+                {
+                    continue;
+                }
+            }
+            LatLong cur = stop.getLocation();
+            double distance = Utilities.getDistanceBetween(cur, loc);
+            if (distance <= radius)
+            {
+                ret.add(stop);
+            }
+        }
+        if (ret.size() == 0)
+        {
+            return null;
+        }
+        return ret;
     }
 
     private String mName;
@@ -134,5 +167,5 @@ class Route implements IRoute
 
     private int mTopOfLoop;
 
-    private ArrayList<Stop> mStops;
+    private ArrayList<Stop> mStops = new ArrayList<Stop>();
 }

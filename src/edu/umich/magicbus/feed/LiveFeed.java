@@ -77,18 +77,30 @@ public class LiveFeed
         mPaths = new ArrayList<Path>();
         mCurrentPath = 0;
         ArrayList<Stop> srcStops = mFeed.getStopsInRangeOf(start, cMaxWalkingDistance);
+        if (srcStops == null)
+        {
+            mPaths = null;
+            return;
+        }
 
         for (Stop srcStop : srcStops)
         {
             Route srcRoute = srcStop.getRoute();
-            ArrayList<Stop> destStops = srcRoute.getStopsInRangeOf(end, cMaxWalkingDistance);
+            ArrayList<Stop> destStops = srcRoute.getStopsInRangeOf(end, cMaxWalkingDistance, srcStop);
+            if (destStops == null)
+            {
+                continue;
+            }
             for (Stop destStop : destStops)
             {
                 double srcToa = srcStop.getEarliestArrivalTime();
                 int busId = srcStop.getIdOfNextBus();
                 double destToa = destStop.getArrivalTimeOf(busId);
                 double travelTime = destToa - srcToa;
-                assert (travelTime > 0);
+                if (travelTime < 0)
+                {
+                    continue;
+                }
 
                 double walkingDistance = Utilities.getDistanceBetween(start, srcStop.getLocation());
                 walkingDistance += Utilities.getDistanceBetween(end, destStop.getLocation());
@@ -107,6 +119,8 @@ public class LiveFeed
         {
             mPaths = null;
         }
+
+        printPaths();
     }
 
     /**
@@ -187,11 +201,34 @@ public class LiveFeed
     /**
      * URL that contains Magic Bus feed.
      */
-    private final String cFeedURL = "http://mbus.pts.umich.edu/shared/public_feed.xml";
-    //private final String cFeedURL = "http://www-personal.umich.edu/~gopalkri/feed.xml";
+    //private final String cFeedURL = "http://mbus.pts.umich.edu/shared/public_feed.xml";
+    private final String cFeedURL = "http://www-personal.umich.edu/~gopalkri/feed.xml";
 
     /**
      * Maximum walking distance used as a radius.
      */
-    private final double cMaxWalkingDistance = 750.0;
+    private final double cMaxWalkingDistance = 250.0;
+
+
+
+    //======DEBUG====
+
+    private void printPaths()
+    {
+        for (Path path : mPaths)
+        {
+            System.out.print("Path: Route: ");
+            System.out.print(path.getRoute().getName());
+            System.out.print(" Start Stop: ");
+            System.out.print(path.getStartStop().getUniqueName());
+            System.out.print(" End Stop: ");
+            System.out.print(path.getEndStop().getUniqueName());
+            System.out.print(" Duration: ");
+            System.out.print(path.getDuration());
+            System.out.print(" Walking Distance: ");
+            System.out.println(path.getWalkingDistance());
+        }
+    }
+
+    //======END DEBUG====
 }

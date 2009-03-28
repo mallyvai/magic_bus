@@ -48,7 +48,7 @@ class Feed
                 throw new XMLException("Invalid xml in livefeed.");
             }
             endPos += 8;
-            mRoutes.add(new Route(xml.substring(startPos, endPos)));
+            mRoutes.add(new Route(xml.substring(startPos, endPos), this));
             startPos = endPos;
         }
 

@@ -1,12 +1,17 @@
 package edu.umich.magicbus.feed;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import edu.umich.magicbus.IStop;
 import edu.umich.magicbus.LatLong;
 
-class Stop implements IStop
+class Stop implements IStop, Comparable<Stop>
 {
     public Stop(String xml, Route owner) throws XMLException
     {
+        mRoute = owner;
+
         int start = xml.indexOf("<name>");
         if (-1 == start)
         {
@@ -89,9 +94,7 @@ class Stop implements IStop
         }
         int toaCount = Integer.parseInt(xml.substring(toaCountStart + 10, end));
 
-        mTimesToArrival = new double[toaCount];
-        mBusIds = new int[toaCount];
-        int i = 0;
+        TreeMap<Double, Integer> arrivals = new TreeMap<Double, Integer>();
 
         while (start < xml.length())
         {
@@ -135,15 +138,24 @@ class Stop implements IStop
             }
             int id = Integer.parseInt(xml.substring(start, end));
 
-            mTimesToArrival[i] = toa;
-            mBusIds[i++] = id;
+            arrivals.put(toa, id);
 
             start = end;
         }
 
-        if (toaCount != i)
+        if (toaCount != arrivals.size())
         {
             throw new XMLException("toa count does not match.");
+        }
+
+        mTimesToArrival = new double[toaCount];
+        mBusIds = new int[toaCount];
+        int i = 0;
+
+        for (Map.Entry<Double, Integer> entry : arrivals.entrySet())
+        {
+            mTimesToArrival[i] = entry.getKey();
+            mBusIds[i++] = entry.getValue();
         }
     }
 
@@ -173,25 +185,34 @@ class Stop implements IStop
 
     public double getEarliestArrivalTime()
     {
-        // TODO Incomplete definition.
-        return -1;
+        return mTimesToArrival[0];
     }
 
     public int getIdOfNextBus()
     {
-        // TODO Incomplete definition.
-        return -1;
+        return mBusIds[0];
     }
 
     public double getArrivalTimeOf(int busId)
     {
-        // TODO Incomplete definition.
+        for (int i = 0; i < mBusIds.length; ++i)
+        {
+            if (mBusIds[i] == busId)
+            {
+                return mTimesToArrival[i];
+            }
+        }
         return -1;
     }
 
     public Route getRoute()
     {
         return mRoute;
+    }
+
+    public int compareTo(Stop other)
+    {
+        return mUniqueName.compareTo(other.getUniqueName());
     }
 
     private Route mRoute;
