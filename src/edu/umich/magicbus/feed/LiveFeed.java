@@ -1,10 +1,5 @@
 package edu.umich.magicbus.feed;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -36,35 +31,7 @@ public class LiveFeed
     {
         mPaths = null;
         mCurrentPath = 0;
-        try
-        {
-            BufferedReader br = new BufferedReader(new InputStreamReader(new URL(cFeedURL).openStream()));
-            String line;
-            StringBuilder builder = new StringBuilder();
-            while ((line = br.readLine()) != null)
-            {
-                builder.append(line);
-            }
-            br.close();
-            mFeed = new Feed(builder.toString());
-        }
-        catch (MalformedURLException ex)
-        {
-            String errMsg = "Magic Bus public feed url is invalid.\n";
-            errMsg += "Perhaps it has been changed since the creation of this application.\n";
-            errMsg += "URL used by this application is: ";
-            errMsg += cFeedURL;
-
-            throw new FeedException(errMsg);
-        }
-        catch (IOException ex)
-        {
-            String errMsg = "Encountered an unexpected error while accessing Magic Bus Feed.\n";
-            errMsg += "Details: ";
-            errMsg += ex.getMessage();
-
-            throw new FeedException(errMsg);
-        }
+        mFeed = new Feed(Utilities.fetchFeedFromURL(cFeedURL));
     }
 
     /**
