@@ -27,7 +27,7 @@ public class LiveFeed
      * Refreshes the feed by fetching it from the magic bus public feed.
      * @throws FeedException
      */
-    public void refresh() throws FeedException
+    public static void refresh() throws FeedException
     {
         mPaths = null;
         mCurrentPath = 0;
@@ -39,7 +39,7 @@ public class LiveFeed
      * @param start Starting location.
      * @param end Ending location.
      */
-    public void computePaths(LatLong start, LatLong end)
+    public static void computePaths(LatLong start, LatLong end)
     {
         mPaths = new ArrayList<Path>();
         mCurrentPath = 0;
@@ -73,9 +73,12 @@ public class LiveFeed
                 walkingDistance += Utilities.getDistanceBetween(end, destStop.getLocation());
                 assert (walkingDistance > 0);
 
-                double walkTime = Utilities.getWalkTime(start, srcStop.getLocation());
-                walkTime += Utilities.getWalkTime(end, destStop.getLocation());
-                assert (walkTime > 0);
+                //double walkTime = Utilities.getWalkTime(start, srcStop.getLocation());
+                //walkTime += Utilities.getWalkTime(end, destStop.getLocation());
+                //assert (walkTime > 0);
+
+                double walkTime = Utilities.getWalkTime(walkingDistance);
+                walkTime += Utilities.getWalkTime(walkingDistance);
                 travelTime += walkTime;
 
                 mPaths.add(new Path(srcRoute, srcStop, destStop, travelTime, walkingDistance));
@@ -87,7 +90,7 @@ public class LiveFeed
             mPaths = null;
         }
 
-        printPaths();
+        // DEBUG STATEMENT - printPaths();
     }
 
     /**
@@ -95,7 +98,7 @@ public class LiveFeed
      * @return Best path.
      * @throws NoPathsFoundException
      */
-    public IPath getBestPath() throws NoPathsFoundException
+    public static IPath getBestPath() throws NoPathsFoundException
     {
         if (mPaths == null)
         {
@@ -113,7 +116,7 @@ public class LiveFeed
      * @return Next path in list of all found paths.
      * @throws NoPathsFoundException
      */
-    public IPath getNextPath() throws NoPathsFoundException
+    public static IPath getNextPath() throws NoPathsFoundException
     {
         if (mPaths == null)
         {
@@ -134,7 +137,7 @@ public class LiveFeed
      * @return Previous path in list of all found paths.
      * @throws NoPathsFoundException
      */
-    public IPath getPreviousPath() throws NoPathsFoundException
+    public static IPath getPreviousPath() throws NoPathsFoundException
     {
         if (mPaths == null)
         {
@@ -152,36 +155,41 @@ public class LiveFeed
     /**
      * Feed as of the most recent refresh.
      */
-    private Feed mFeed;
+    private static Feed mFeed;
 
     /**
      * All paths found from the previous call to computePaths.
      */
-    private ArrayList<Path> mPaths;
+    private static ArrayList<Path> mPaths;
 
     /**
      * Position of current Path in sequence of iteration through mPaths via getNextPath and
      * getPreviousPath.
      */
-    private int mCurrentPath;
+    private static int mCurrentPath;
 
     /**
      * URL that contains Magic Bus feed.
      */
     //private final String cFeedURL = "http://mbus.pts.umich.edu/shared/public_feed.xml";
-    private final String cFeedURL = "http://www-personal.umich.edu/~gopalkri/feed.xml";
+    private final static String cFeedURL = "http://www-personal.umich.edu/~gopalkri/feed.xml";
 
     /**
      * Maximum walking distance used as a radius.
      */
-    private final double cMaxWalkingDistance = 250.0;
+    private final static double cMaxWalkingDistance = 750.0;
 
 
 
     //======DEBUG====
 
-    private void printPaths()
+    private static void printPaths()
     {
+        if (mPaths == null || mPaths.size() < 1)
+        {
+            System.out.println("No paths found!");
+            return;
+        }
         for (Path path : mPaths)
         {
             System.out.print("Path: Route: ");

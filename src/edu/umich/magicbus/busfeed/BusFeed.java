@@ -22,7 +22,7 @@ public class BusFeed
         fetchFeed();
     }
 
-    public ArrayList<Bus> getBuses() throws FeedException
+    public static ArrayList<Bus> getBuses() throws FeedException
     {
         long curTime = System.currentTimeMillis();
         if (curTime - mPreviousFetch >= cRefetchThreshold)
@@ -32,7 +32,7 @@ public class BusFeed
         return mBuses;
     }
 
-    private void fetchFeed() throws FeedException
+    private static void fetchFeed() throws FeedException
     {
         mPreviousFetch = cRefetchThreshold;
         mBuses = new ArrayList<Bus>();
@@ -82,9 +82,9 @@ public class BusFeed
         mBuses.trimToSize();
     }
 
-    private ArrayList<Bus> mBuses;
+    private static ArrayList<Bus> mBuses;
 
-    private long mPreviousFetch;
+    private static long mPreviousFetch;
 
     private static final String cFeedURL = "http://mbus.pts.umich.edu/shared/location_feed.xml";
 

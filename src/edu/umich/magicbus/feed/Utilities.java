@@ -54,6 +54,12 @@ public class Utilities
         return -1;
     }
 
+    public static double getWalkTime(double distance)
+    {
+        double walkSpeed = 1.38; // 5 Kmph, expressed in meters per second.
+        return distance / walkSpeed;
+    }
+
     /**
      * Gets all stops within radius meters of loc. Distance measured is the walking distance. All
      * stops in allStops are considered.
